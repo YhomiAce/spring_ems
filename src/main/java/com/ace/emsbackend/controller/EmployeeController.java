@@ -1,5 +1,6 @@
 package com.ace.emsbackend.controller;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -16,10 +17,10 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/employees")
 public class EmployeeController {
-    private final EmployeeService employeeService;
+    private EmployeeService employeeService;
 
     @PostMapping
-    public ResponseEntity<EmployeeDto> create(@RequestBody EmployeeDto employeeDto) {
+    public ResponseEntity<EmployeeDto> create(@RequestBody EmployeeDto employeeDto) throws SQLIntegrityConstraintViolationException {
         EmployeeDto savedEmployee = employeeService.create(employeeDto);
         return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
     }

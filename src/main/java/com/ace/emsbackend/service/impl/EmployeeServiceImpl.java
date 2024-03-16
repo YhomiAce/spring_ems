@@ -1,6 +1,8 @@
 package com.ace.emsbackend.service.impl;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -17,19 +19,22 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
-    private final EmployeeRepository employeeRepository;
+    private EmployeeRepository employeeRepository;
 
     @Override
-    public EmployeeDto create(EmployeeDto employeeDto) {
-        Employee employee = EmployeeMapper.mapToEmployee(employeeDto);
-        Employee savedEmployee = employeeRepository.save(employee);
-        return EmployeeMapper.mapToEmployeeDto(savedEmployee);
+    public EmployeeDto create(EmployeeDto employeeDto) throws SQLIntegrityConstraintViolationException {
+        try{
+            Employee employee = EmployeeMapper.mapToEmployee(employeeDto);
+            Employee savedEmployee = employeeRepository.save(employee);
+            return EmployeeMapper.mapToEmployeeDto(savedEmployee);
+        }catch (Exception e) {
+            throw new RejectedExecutionException("Employee Already exist");
+        }
     }
 
     private Employee findEmployeeById(Long id) {
-        Employee employee = employeeRepository.findById(id)
+        return employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee Not Found"));
-        return employee;
     }
 
     @Override
